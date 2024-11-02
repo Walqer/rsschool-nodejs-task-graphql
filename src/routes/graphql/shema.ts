@@ -1,4 +1,9 @@
-import { PrismaClient } from '@prisma/client';
+import {
+  Post as IPost,
+  PrismaClient,
+  Profile as IProfile,
+  User as IUser,
+} from '@prisma/client';
 import {
   GraphQLBoolean,
   GraphQLEnumType,
@@ -6,7 +11,6 @@ import {
   GraphQLFloat,
   GraphQLInputObjectType,
   GraphQLInt,
-  GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
@@ -273,6 +277,249 @@ export const memberType: GraphQLFieldConfig<unknown, { prisma: PrismaClient }> =
   },
 };
 
+const Mutations = new GraphQLObjectType({
+  name: 'Mutations',
+  fields: {
+    createUser: {
+      type: User,
+      args: {
+        userArgs: {
+          type: new GraphQLNonNull(CreateUserInput),
+        },
+      },
+      resolve: async (
+        _,
+        { dto }: { dto: Omit<IUser, 'id'> },
+        { prisma }: { prisma: PrismaClient },
+      ) => {
+        const result: IUser = await prisma.user.create({
+          data: {
+            ...dto,
+          },
+        });
+        return result;
+      },
+    },
+    createProfile: {
+      type: Profile,
+      args: {
+        profileArgs: {
+          type: new GraphQLNonNull(CreateProfileInput),
+        },
+      },
+      resolve: async (
+        _,
+        { dto }: { dto: Omit<IProfile, 'id'> },
+        { prisma }: { prisma: PrismaClient },
+      ) => {
+        const result: IProfile = await prisma.profile.create({
+          data: {
+            ...dto,
+          },
+        });
+        return result;
+      },
+    },
+    createPost: {
+      type: Post,
+      args: {
+        postArgs: {
+          type: new GraphQLNonNull(CreatePostInput),
+        },
+      },
+      resolve: async (
+        _,
+        { dto }: { dto: Omit<IPost, 'id'> },
+        { prisma }: { prisma: PrismaClient },
+      ) => {
+        const result: IPost = await prisma.post.create({
+          data: {
+            ...dto,
+          },
+        });
+        return result;
+      },
+    },
+    changePost: {
+      type: Post,
+      args: {
+        id: {
+          type: new GraphQLNonNull(UUIDType),
+        },
+        dto: {
+          type: new GraphQLNonNull(ChangePostInput),
+        },
+      },
+      resolve: async (
+        _,
+        { id, dto }: { id: string; dto: Omit<IPost, 'id'> },
+        { prisma }: { prisma: PrismaClient },
+      ) => {
+        const result: IPost = await prisma.post.update({
+          where: { id },
+          data: {
+            ...dto,
+          },
+        });
+        return result;
+      },
+    },
+    changeProfile: {
+      type: Profile,
+      args: {
+        id: {
+          type: new GraphQLNonNull(UUIDType),
+        },
+        dto: {
+          type: new GraphQLNonNull(ChangeProfileInput),
+        },
+      },
+      resolve: async (
+        _,
+        { id, dto }: { id: string; dto: Omit<IProfile, 'id'> },
+        { prisma }: { prisma: PrismaClient },
+      ) => {
+        const result: IProfile = await prisma.profile.update({
+          where: { id },
+          data: {
+            ...dto,
+          },
+        });
+        return result;
+      },
+    },
+    changeUser: {
+      type: User,
+      args: {
+        id: {
+          type: new GraphQLNonNull(UUIDType),
+        },
+        dto: {
+          type: new GraphQLNonNull(ChangeUserInput),
+        },
+      },
+      resolve: async (
+        _,
+        { id, dto }: { id: string; dto: Omit<IUser, 'id'> },
+        { prisma }: { prisma: PrismaClient },
+      ) => {
+        const result: IUser = await prisma.user.update({
+          where: { id },
+          data: {
+            ...dto,
+          },
+        });
+        return result;
+      },
+    },
+    deleteUser: {
+      type: User,
+      args: {
+        id: {
+          type: new GraphQLNonNull(UUIDType),
+        },
+      },
+      resolve: async (
+        _,
+        { id }: { id: string },
+        { prisma }: { prisma: PrismaClient },
+      ) => {
+        const result: IUser = await prisma.user.delete({
+          where: { id },
+        });
+        return result;
+      },
+    },
+    deletePost: {
+      type: Post,
+      args: {
+        id: {
+          type: new GraphQLNonNull(UUIDType),
+        },
+      },
+      resolve: async (
+        _,
+        { id }: { id: string },
+        { prisma }: { prisma: PrismaClient },
+      ) => {
+        const result: IPost = await prisma.post.delete({
+          where: { id },
+        });
+        return result;
+      },
+    },
+    deleteProfile: {
+      type: Profile,
+      args: {
+        id: {
+          type: new GraphQLNonNull(UUIDType),
+        },
+      },
+      resolve: async (
+        _,
+        { id }: { id: string },
+        { prisma }: { prisma: PrismaClient },
+      ) => {
+        const result: IProfile = await prisma.profile.delete({
+          where: { id },
+        });
+        return result;
+      },
+    },
+    subscribeTo: {
+      type: User,
+      args: {
+        userId: {
+          type: new GraphQLNonNull(UUIDType),
+        },
+        authorId: {
+          type: new GraphQLNonNull(UUIDType),
+        },
+      },
+      resolve: async (
+        _,
+        { userId, authorId }: { userId: string; authorId: string },
+        { prisma }: { prisma: PrismaClient },
+      ) => {
+        const result = await prisma.subscribersOnAuthors.create({
+          data: {
+            subscriberId: userId,
+            authorId,
+          },
+        });
+        return result;
+      },
+    },
+    unsubscribeFrom: {
+      type: User,
+      args: {
+        userId: {
+          type: new GraphQLNonNull(UUIDType),
+        },
+        authorId: {
+          type: new GraphQLNonNull(UUIDType),
+        },
+      },
+      resolve: async (
+        _,
+        { userId, authorId }: { userId: string; authorId: string },
+        { prisma }: { prisma: PrismaClient },
+      ) => {
+        const result = await prisma.subscribersOnAuthors.delete({
+          where: {
+            subscriberId_authorId: {
+              subscriberId: userId,
+              authorId,
+            },
+          },
+        });
+        return result;
+      },
+    },
+  },
+});
+
 export const schema = new GraphQLSchema({
   query: RootQueryType,
+  mutation: Mutations,
 });
