@@ -57,7 +57,7 @@ const ChangeUserInput = new GraphQLInputObjectType({
   name: 'ChangeUserInput',
   fields: {
     name: { type: GraphQLString },
-    balance: { type: GraphQLString },
+    balance: { type: GraphQLFloat },
   },
 });
 
@@ -84,7 +84,7 @@ const CreateUserInput = new GraphQLInputObjectType({
   name: 'CreateUserInput',
   fields: {
     name: { type: new GraphQLNonNull(GraphQLString) },
-    balance: { type: new GraphQLNonNull(GraphQLInt) },
+    balance: { type: new GraphQLNonNull(GraphQLFloat) },
   },
 });
 
@@ -283,7 +283,7 @@ const Mutations = new GraphQLObjectType({
     createUser: {
       type: User,
       args: {
-        userArgs: {
+        dto: {
           type: new GraphQLNonNull(CreateUserInput),
         },
       },
@@ -303,7 +303,7 @@ const Mutations = new GraphQLObjectType({
     createProfile: {
       type: Profile,
       args: {
-        profileArgs: {
+        dto: {
           type: new GraphQLNonNull(CreateProfileInput),
         },
       },
@@ -323,7 +323,7 @@ const Mutations = new GraphQLObjectType({
     createPost: {
       type: Post,
       args: {
-        postArgs: {
+        dto: {
           type: new GraphQLNonNull(CreatePostInput),
         },
       },
@@ -413,7 +413,7 @@ const Mutations = new GraphQLObjectType({
       },
     },
     deleteUser: {
-      type: User,
+      type: new GraphQLNonNull(GraphQLString),
       args: {
         id: {
           type: new GraphQLNonNull(UUIDType),
@@ -427,11 +427,15 @@ const Mutations = new GraphQLObjectType({
         const result: IUser = await prisma.user.delete({
           where: { id },
         });
-        return result;
+        if (result.id) {
+          return 'User deleted successfully';
+        } else {
+          return 'Error deleting user';
+        }
       },
     },
     deletePost: {
-      type: Post,
+      type: new GraphQLNonNull(GraphQLString),
       args: {
         id: {
           type: new GraphQLNonNull(UUIDType),
@@ -445,11 +449,15 @@ const Mutations = new GraphQLObjectType({
         const result: IPost = await prisma.post.delete({
           where: { id },
         });
-        return result;
+        if (result.id) {
+          return 'Succes';
+        } else {
+          return 'Error deleting post';
+        }
       },
     },
     deleteProfile: {
-      type: Profile,
+      type: new GraphQLNonNull(GraphQLString),
       args: {
         id: {
           type: new GraphQLNonNull(UUIDType),
@@ -463,11 +471,15 @@ const Mutations = new GraphQLObjectType({
         const result: IProfile = await prisma.profile.delete({
           where: { id },
         });
-        return result;
+        if (result.id) {
+          return 'Profile deleted successfully';
+        } else {
+          return 'Error deleting profile';
+        }
       },
     },
     subscribeTo: {
-      type: User,
+      type: new GraphQLNonNull(GraphQLString),
       args: {
         userId: {
           type: new GraphQLNonNull(UUIDType),
@@ -487,11 +499,15 @@ const Mutations = new GraphQLObjectType({
             authorId,
           },
         });
-        return result;
+        if (result.authorId) {
+          return 'Subscribed successfully';
+        } else {
+          return 'Error subscribing';
+        }
       },
     },
     unsubscribeFrom: {
-      type: User,
+      type: new GraphQLNonNull(GraphQLString),
       args: {
         userId: {
           type: new GraphQLNonNull(UUIDType),
@@ -513,7 +529,11 @@ const Mutations = new GraphQLObjectType({
             },
           },
         });
-        return result;
+        if (result.authorId) {
+          return 'Subscribed successfully';
+        } else {
+          return 'Error subscribing';
+        }
       },
     },
   },
